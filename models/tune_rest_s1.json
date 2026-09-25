@@ -1,0 +1,74 @@
+[
+  {
+    "rest_factor": null,
+    "epochs": 14,
+    "brut": {
+      "balanced_accuracy": 0.7228194633955578,
+      "rappel_gestes": 0.7087378640776699,
+      "faux_gestes_au_repos": 0.1437394722066255,
+      "declenchements_intempestifs_par_min": 51.207186973610334
+    },
+    "post_traite": {
+      "tau": 0.6,
+      "k": 3,
+      "balanced_accuracy": 0.6384818110060206,
+      "rappel_gestes": 0.61084142394822,
+      "faux_gestes_au_repos": 0.044918585064570464,
+      "declenchements_intempestifs_par_min": 12.128017967434026
+    }
+  },
+  {
+    "rest_factor": 1,
+    "epochs": 10,
+    "brut": {
+      "balanced_accuracy": 0.6502049740922694,
+      "rappel_gestes": 0.6067961165048543,
+      "faux_gestes_au_repos": 0.016844469399213923,
+      "declenchements_intempestifs_par_min": 4.042672655811342
+    },
+    "post_traite": {
+      "tau": 0.0,
+      "k": 3,
+      "balanced_accuracy": 0.6591046071643369,
+      "rappel_gestes": 0.616504854368932,
+      "faux_gestes_au_repos": 0.018528916339135316,
+      "declenchements_intempestifs_par_min": 3.368893879842785
+    }
+  },
+  {
+    "rest_factor": 3,
+    "epochs": 7,
+    "brut": {
+      "balanced_accuracy": 0.5529612172722631,
+      "rappel_gestes": 0.49029126213592233,
+      "faux_gestes_au_repos": 0.015721504772599662,
+      "declenchements_intempestifs_par_min": 2.021336327905671
+    },
+    "post_traite": {
+      "tau": 0.0,
+      "k": 3,
+      "balanced_accuracy": 0.5563183896839229,
+      "rappel_gestes": 0.49514563106796117,
+      "faux_gestes_au_repos": 0.016844469399213923,
+      "declenchements_intempestifs_par_min": 2.021336327905671
+    }
+  },
+  {
+    "rest_factor": 9,
+    "epochs": 20,
+    "brut": {
+      "balanced_accuracy": 0.5989578687514564,
+      "rappel_gestes": 0.5542071197411004,
+      "faux_gestes_au_repos": 0.026389668725435148,
+      "declenchements_intempestifs_par_min": 6.064008983717013
+    },
+    "post_traite": {
+      "tau": 0.0,
+      "k": 3,
+      "balanced_accuracy": 0.603458506881236,
+      "rappel_gestes": 0.5614886731391586,
+      "faux_gestes_au_repos": 0.027512633352049412,
+      "declenchements_intempestifs_par_min": 4.716451431779899
+    }
+  }
+]
