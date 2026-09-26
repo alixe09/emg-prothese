@@ -39,6 +39,63 @@ que le modèle apprend à reconnaître :
 
 ![Carte d'activation musculaire par geste](docs/carte_activation.png)
 
+## Résultats (5 sujets DB2, exercice 1 : 17 gestes + repos)
+
+Évaluation **en flux continu** (une décision toutes les 50 ms, transitions entre
+gestes comprises), sur les répétitions 2 et 5 jamais vues à l'entraînement.
+Métriques orientées porteur : accuracy équilibrée entre gestes, **faux gestes au
+repos** (la prothèse bouge sans que l'utilisateur le veuille) et délai total de
+décision (fenêtre 200 ms + vote + calcul, budget ~300 ms).
+
+### Nouvel utilisateur : combien de calibration faut-il ?
+
+Protocole *leave-one-subject-out* : chaque sujet joue le nouveau porteur, le CNN
+est pré-entraîné sur les 4 autres puis ajusté avec 1, 2 ou 4 répétitions du
+nouveau porteur (1 répétition ≈ 2 min 20 d'enregistrement). Post-traitement
+identique pour toutes les méthodes (vote sur 3 décisions, ~250–275 ms de délai).
+Moyenne ± écart-type sur les 5 sujets :
+
+| Calibration | Méthode | Acc. équilibrée | Faux gestes au repos |
+|---|---|---|---|
+| aucune | CNN pré-entraîné | 17.7 ± 3.8 % | 8.6 % |
+| 1 répétition | **LDA** (Hudgins) | **52.6 ± 5.6 %** | 11.4 % |
+| | CNN seul | 39.8 ± 3.9 % | 4.3 % |
+| | CNN pré-entraîné + ajusté | 45.5 ± 4.3 % | 7.5 % |
+| 2 répétitions | LDA | 59.0 ± 4.2 % | 7.9 % |
+| | CNN seul | 57.1 ± 4.4 % | 9.9 % |
+| | CNN pré-entraîné + ajusté | 56.8 ± 5.7 % | **4.6 %** |
+| 4 répétitions | LDA | 61.8 ± 4.3 % | 7.1 % |
+| | CNN seul | 60.5 ± 8.6 % | 4.7 % |
+| | **CNN pré-entraîné + ajusté** | **63.4 ± 6.3 %** | **3.8 %** |
+
+Lecture :
+- **Sans calibration, rien ne marche** (17.7 %) : les signaux EMG diffèrent trop
+  d'une personne à l'autre (placement des électrodes, morphologie). Une phase de
+  calibration est indispensable.
+- **Calibration très courte (1 répétition) : la LDA est la plus robuste**, au prix
+  de nombreux faux gestes au repos.
+- **Avec 4 répétitions, le CNN pré-entraîné sur d'autres sujets donne la
+  meilleure précision et divise presque par 2 les faux gestes au repos** par
+  rapport à la LDA. Le pré-entraînement améliore le CNN à 1 et 4 répétitions
+  (+5.7 et +2.9 points), pas à 2.
+- Le gain en précision reste modeste et n'apparaît que sur 3 sujets sur 5 : avec
+  5 sujets, il n'est pas statistiquement établi. Le sujet 4, le plus difficile
+  pour toutes les méthodes, est aussi le seul gaucher (protocole réalisé main
+  droite) — hypothèse non vérifiée.
+
+Détails : `models/transfer_summary.json` (valeurs par sujet), code dans
+[`src/transfer.py`](src/transfer.py). Comparaison intra-sujet avec seuil de
+confiance réglé sur validation : [`src/evaluate_stream.py`](src/evaluate_stream.py),
+résumé par `python src/summarize.py`.
+
+### Limites
+
+- 5 sujets valides seulement, un seul entraînement par configuration (pas de
+  répétition sur plusieurs graines aléatoires).
+- Réglages (seuil, nombre d'époques) choisis sur une seule répétition de
+  validation : peu fiable sur certains sujets.
+- Pas encore de sujets amputés (DB3) : la question clé pour une vraie prothèse.
+
 ## Démarche prévue
 
 1. **Exploration** — visualisation des signaux par électrode et par geste.
