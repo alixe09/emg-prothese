@@ -80,7 +80,7 @@ Lecture :
   (+5.7 et +2.9 points), pas à 2.
 - Le gain en précision reste modeste et n'apparaît que sur 3 sujets sur 5 : avec
   5 sujets, il n'est pas statistiquement établi. Le sujet 4, le plus difficile
-  pour toutes les méthodes, est aussi le seul gaucher (protocole réalisé main
+  pour toutes les méthodes, est aussi le seul sujet gaucher (protocole réalisé main
   droite) — hypothèse non vérifiée.
 
 Détails : `models/transfer_summary.json` (valeurs par sujet), code dans
