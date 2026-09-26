@@ -1,0 +1,53 @@
+{
+  "lda": {
+    "balanced_accuracy": {
+      "moyenne": 59.080401795622414,
+      "ecart_type": 5.011207009583778
+    },
+    "rappel_gestes": {
+      "moyenne": 55.398919172130206,
+      "ecart_type": 5.508759022462471
+    },
+    "faux_gestes_au_repos": {
+      "moyenne": 4.912815782367659,
+      "ecart_type": 1.985528331119564
+    },
+    "declenchements_intempestifs_par_min": {
+      "moyenne": 12.124087416768184,
+      "ecart_type": 4.101586734710888
+    },
+    "delai_ms": {
+      "moyenne": 251.17111520000617,
+      "ecart_type": 0.2919025981542856
+    }
+  },
+  "cnn": {
+    "balanced_accuracy": {
+      "moyenne": 59.290633474290736,
+      "ecart_type": 8.542944777611721
+    },
+    "rappel_gestes": {
+      "moyenne": 54.15436853764337,
+      "ecart_type": 8.658865437215571
+    },
+    "faux_gestes_au_repos": {
+      "moyenne": 2.9914399030403827,
+      "ecart_type": 1.1365164842150608
+    },
+    "declenchements_intempestifs_par_min": {
+      "moyenne": 9.76268185789412,
+      "ecart_type": 5.077492310161748
+    },
+    "delai_ms": {
+      "moyenne": 252.35410380005487,
+      "ecart_type": 25.652422877087773
+    }
+  },
+  "subjects": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ]
+}
