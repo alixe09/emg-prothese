@@ -9,3 +9,4 @@ data/processed/*
 *.zip
 .streamlit/
 logs/
+.claude/

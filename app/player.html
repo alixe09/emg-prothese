@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --surface: #fcfcfb; --plane: #f4f3ef; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+    --grid: #e6e5e1; --blue: #2a78d6; --orange: #eb6834; --critical: #d03b3b; --rest: #dcdbd6;
+    --skin: #e8c4a8; --skin-dark: #c99a7c; --palm: #f2d6c2; --band: #f0efec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface: #1a1a19; --plane: #0d0d0d; --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
+      --grid: #383835; --blue: #3987e5; --orange: #d95926; --critical: #e66767; --rest: #4a4a46;
+      --skin: #c99a7c; --skin-dark: #9c7258; --palm: #dcb49a; --band: #2a2a28;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Source Sans Pro", system-ui, sans-serif; color: var(--ink); background: transparent; }
+  .card { background: var(--surface); border: 1px solid var(--grid); border-radius: 12px; padding: 14px 16px; }
+  .top { display: grid; grid-template-columns: 1fr 300px; gap: 14px; }
+  .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  canvas { width: 100%; display: block; }
+  #emg { height: 330px; }
+  #timeline { height: 34px; cursor: pointer; }
+  .state { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .state div { font-size: 15px; line-height: 1.25; min-height: 38px; }
+  .state b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+  #verdict { font-weight: 700; }
+  .ok { color: var(--blue); } .ko { color: var(--critical); } .neutral { color: var(--ink2); }
+  .conf { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .conf > span { display: block; height: 100%; background: var(--blue); width: 0; transition: width .1s; }
+  .controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  button { font: inherit; font-size: 14px; border: 1px solid var(--grid); background: var(--plane); color: var(--ink);
+           border-radius: 8px; padding: 5px 14px; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  #clock { font-variant-numeric: tabular-nums; color: var(--ink2); font-size: 13px; margin-left: auto; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink2); margin-top: 6px; }
+  .legend i { display: inline-block; width: 12px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  svg text { font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="card">
+    <div class="label">Signal EMG filtré — 12 électrodes, 3 dernières secondes (fond grisé : geste en cours)</div>
+    <canvas id="emg"></canvas>
+    <div class="controls">
+      <button id="play">⏸ Pause</button>
+      <button id="restart">↺ Recommencer</button>
+      <span id="clock"></span>
+    </div>
+    <div class="label" style="margin-top:10px">Décisions de la prothèse sur toute la séquence (cliquer pour se déplacer)</div>
+    <canvas id="timeline"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--blue)"></i>geste correct</span>
+      <span><i style="background:var(--rest)"></i>repos correct</span>
+      <span><i style="background:var(--orange)"></i>mauvais geste</span>
+      <span><i style="background:var(--muted)"></i>geste manqué (repos décodé)</span>
+      <span><i style="background:var(--critical)"></i>mouvement non voulu au repos</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="label">Prothèse (main droite, vue de dessus)</div>
+    <svg id="hand" viewBox="0 0 300 330" width="100%" height="330"></svg>
+    <div class="state">
+      <div><b>Geste voulu</b><span id="truth">—</span></div>
+      <div><b>Geste décodé</b><span id="pred">—</span></div>
+    </div>
+    <div id="verdict" class="neutral">&nbsp;</div>
+    <div class="label" style="margin-top:6px">Confiance du modèle</div>
+    <div class="conf"><span id="confbar"></span></div>
+    <div class="hint" id="delay"></div>
+  </div>
+</div>
+<script>
+const D = __PAYLOAD__;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const N = D.dec.t.length, dur = D.duration;
+
+// ---------- Poses de la main pour chaque geste ----------
+// f : flexion [index, majeur, annulaire, auriculaire] (0 tendu, 1 replié)
+// th : pouce {a: angle en degrés (0 = vers le haut, négatif = vers l'extérieur), l: longueur relative}
+// spread : écartement des doigts ; dev : inclinaison radiale (+) / ulnaire (-)
+// wf : flexion (+) / extension (-) du poignet ; ps : supination (+) / pronation (-)
+const P = (f, th, o = {}) => Object.assign({ f, tha: th[0], thl: th[1], spread: 0, dev: 0, wf: 0, ps: 0 }, o);
+const POSES = {
+  0: P([.15, .15, .15, .2], [-45, .9]),
+  1: P([1, 1, 1, 1], [-5, 1]),
+  2: P([0, 0, 1, 1], [35, .6]),
+  3: P([0, 0, 1, 1], [-50, 1]),
+  4: P([0, 0, 0, 0], [70, .8]),
+  5: P([0, 0, 0, 0], [-70, 1], { spread: 1 }),
+  6: P([1, 1, 1, 1], [40, .6]),
+  7: P([0, 1, 1, 1], [35, .6]),
+  8: P([0, 0, 0, 0], [-25, .95], { spread: -.6 }),
+  9: P([.1, .1, .1, .1], [-45, .9], { ps: 1 }),
+  10: P([.1, .1, .1, .1], [-45, .9], { ps: -1 }),
+  11: P([.1, .1, .1, .1], [-45, .9], { ps: .8, dev: -.2 }),
+  12: P([.1, .1, .1, .1], [-45, .9], { ps: -.8, dev: -.2 }),
+  13: P([.2, .2, .2, .2], [-40, .9], { wf: 1 }),
+  14: P([.1, .1, .1, .1], [-45, .9], { wf: -1 }),
+  15: P([.1, .1, .1, .1], [-45, .9], { dev: 1 }),
+  16: P([.1, .1, .1, .1], [-45, .9], { dev: -1 }),
+  17: P([1, 1, 1, 1], [40, .6], { wf: -1 }),
+};
+let pose = JSON.parse(JSON.stringify(POSES[0]));
+const lerp = (a, b, k) => a + (b - a) * k;
+function stepPose(target, k) {
+  for (let i = 0; i < 4; i++) pose.f[i] = lerp(pose.f[i], target.f[i], k);
+  for (const p of ["tha", "thl", "spread", "dev", "wf", "ps"]) pose[p] = lerp(pose[p], target[p], k);
+}
+
+// ---------- Dessin SVG ----------
+const svg = document.getElementById("hand");
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs, parent = svg) => {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  parent.appendChild(e); return e;
+};
+// Avant-bras avec électrodes : E1–E8 en anneau, E9 fléchisseur, E10 extenseur ; E11/E12 sur le bras
+el("rect", { x: 112, y: 262, width: 76, height: 70, rx: 10, fill: "var(--skin)" });
+el("rect", { x: 112, y: 286, width: 76, height: 16, fill: "var(--band)", opacity: .9 });
+const elec = [];
+for (let i = 0; i < 8; i++) elec.push(el("circle", { cx: 119 + i * 8.9, cy: 294, r: 3.6 }));
+elec.push(el("circle", { cx: 130, cy: 316, r: 4.2 }));  // E9 fléchisseur
+elec.push(el("circle", { cx: 170, cy: 316, r: 4.2 }));  // E10 extenseur
+elec.push(el("circle", { cx: 32, cy: 300, r: 5 }));     // E11 biceps
+elec.push(el("circle", { cx: 32, cy: 318, r: 5 }));     // E12 triceps
+el("text", { x: 42, y: 304, "font-size": 10, fill: "var(--muted)" }).textContent = "biceps";
+el("text", { x: 42, y: 322, "font-size": 10, fill: "var(--muted)" }).textContent = "triceps";
+el("text", { x: 196, y: 298, "font-size": 10, fill: "var(--muted)" }).textContent = "E1–E8";
+
+const handG = el("g", {});
+const palm = el("rect", { x: 100, y: 160, width: 100, height: 105, rx: 22 }, handG);
+const FINGERS = [ // x de la base, longueur, largeur, angle d'écartement
+  { x: 111, L: 78, w: 21, a: -11 }, { x: 137, L: 88, w: 22, a: -3.5 },
+  { x: 163, L: 81, w: 21, a: 3.5 }, { x: 187, L: 62, w: 18, a: 11 },
+];
+const fingerEls = FINGERS.map(() => ({
+  g: el("g", {}, handG), body: null, nail: null,
+}));
+fingerEls.forEach(fe => {
+  fe.body = el("rect", { rx: 10 }, fe.g);
+  fe.nail = el("rect", { rx: 5, fill: "var(--skin-dark)", opacity: .55 }, fe.g);
+});
+const thumbG = el("g", {}, handG);
+const thumb = el("rect", { rx: 11, width: 24 }, thumbG);
+const knuckles = el("path", { fill: "none", stroke: "var(--skin-dark)", "stroke-width": 2, "stroke-linecap": "round", opacity: 0 }, handG);
+const arrow = el("text", { x: 150, y: 24, "text-anchor": "middle", "font-size": 13, fill: "var(--ink2)" });
+
+function drawHand() {
+  const supin = pose.ps > 0.35;
+  const skin = supin ? "var(--palm)" : "var(--skin)";
+  palm.setAttribute("fill", skin);
+  const wx = 150, wy = 262;
+  const sx = Math.max(0.3, Math.cos(pose.ps * 1.2));
+  const sy = 1 - 0.38 * Math.abs(pose.wf);
+  handG.setAttribute("transform",
+    `translate(${wx} ${wy}) rotate(${-24 * pose.dev}) scale(${sx} ${sy}) translate(${-wx} ${-wy})`);
+  FINGERS.forEach((F, i) => {
+    const fl = pose.f[i], len = F.L * (1 - 0.74 * fl);
+    const fe = fingerEls[i];
+    fe.g.setAttribute("transform", `rotate(${F.a * (1 + 1.6 * pose.spread) * (1 - fl)} ${F.x} 166)`);
+    fe.body.setAttribute("x", F.x - F.w / 2); fe.body.setAttribute("width", F.w);
+    fe.body.setAttribute("y", 166 - len); fe.body.setAttribute("height", len + 8);
+    fe.body.setAttribute("fill", fl > .5 ? "var(--skin-dark)" : skin);
+    fe.nail.setAttribute("x", F.x - F.w / 2 + 4); fe.nail.setAttribute("width", F.w - 8);
+    fe.nail.setAttribute("y", 169 - len); fe.nail.setAttribute("height", 11);
+    fe.nail.setAttribute("opacity", supin ? 0 : (fl > .5 ? 0 : .5));
+  });
+  const tl = 72 * pose.thl;
+  thumb.setAttribute("x", -12); thumb.setAttribute("y", -tl); thumb.setAttribute("height", tl + 6);
+  thumb.setAttribute("fill", skin);
+  thumbG.setAttribute("transform", `translate(104 238) rotate(${pose.tha})`);
+  const fist = pose.f.reduce((a, b) => a + b, 0) / 4;
+  knuckles.setAttribute("d", "M101 150 Q150 138 199 150");
+  knuckles.setAttribute("opacity", fist > .6 ? .8 : 0);
+  arrow.textContent = pose.wf > .4 ? "↓ poignet fléchi" : pose.wf < -.4 ? "↑ poignet en extension"
+    : pose.ps > .4 ? "⟳ supination (paume visible)" : pose.ps < -.4 ? "⟲ pronation" : "";
+}
+
+// ---------- EMG ----------
+const cv = document.getElementById("emg"), ctx = cv.getContext("2d");
+const tl = document.getElementById("timeline"), tctx = tl.getContext("2d");
+function fit(c) { const r = c.getBoundingClientRect(), k = devicePixelRatio || 1;
+  c.width = r.width * k; c.height = r.height * k; c.getContext("2d").setTransform(k, 0, 0, k, 0, 0); }
+fit(cv); fit(tl);
+const WIN = 3;
+
+function decisionAt(t) { // dernière décision disponible à l'instant t
+  let lo = 0, hi = N - 1, best = -1;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (D.dec.t[m] <= t) { best = m; lo = m + 1; } else hi = m - 1; }
+  return best;
+}
+
+function drawEMG(t) {
+  const W = cv.getBoundingClientRect().width, H = cv.getBoundingClientRect().height;
+  ctx.clearRect(0, 0, W, H);
+  const left = 34, w = W - left - 4, rowH = H / 12;
+  const t0 = t - WIN, px = s => left + (s - t0) / WIN * w;
+  // fond grisé pendant les gestes voulus
+  ctx.fillStyle = css("--band");
+  const i0 = Math.max(0, decisionAt(t0)), i1 = decisionAt(t);
+  for (let i = i0; i <= i1 && i >= 0; i++) {
+    if (D.dec.truth[i] > 0) {
+      const a = Math.max(D.dec.t[i] - 0.05, t0), b = i + 1 < N ? Math.min(D.dec.t[i + 1], t) : t;
+      if (b > a) ctx.fillRect(px(a), 0, px(b) - px(a) + 0.5, H);
+    }
+  }
+  const n0 = Math.max(0, Math.floor(t0 * D.fsDisp)), n1 = Math.min(D.emg[0].length, Math.floor(t * D.fsDisp));
+  ctx.font = "11px system-ui"; ctx.textBaseline = "middle";
+  for (let c = 0; c < 12; c++) {
+    const y0 = rowH * (c + .5);
+    ctx.fillStyle = css("--muted"); ctx.fillText("E" + (c + 1), 2, y0);
+    ctx.strokeStyle = css("--blue"); ctx.lineWidth = 1; ctx.beginPath();
+    const arr = D.emg[c];
+    for (let n = n0; n < n1; n++) {
+      const x = px(n / D.fsDisp), y = y0 - arr[n] / 100 * rowH * .55;
+      n === n0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+// ---------- Frise ----------
+function outcome(i) {
+  const tr = D.dec.truth[i], pr = D.dec.pred[i];
+  if (tr === 0) return pr === 0 ? "--rest" : "--critical";
+  if (pr === tr) return "--blue";
+  return pr === 0 ? "--muted" : "--orange";
+}
+const tlCache = document.createElement("canvas");
+function buildTimeline() {
+  const r = tl.getBoundingClientRect(); tlCache.width = tl.width; tlCache.height = tl.height;
+  const c = tlCache.getContext("2d"); c.setTransform(devicePixelRatio || 1, 0, 0, devicePixelRatio || 1, 0, 0);
+  for (let i = 0; i < N; i++) {
+    const a = D.dec.t[i] / dur * r.width, b = (i + 1 < N ? D.dec.t[i + 1] : dur) / dur * r.width;
+    c.fillStyle = css(outcome(i)); c.fillRect(a, 4, Math.max(b - a, 1), r.height - 8);
+  }
+}
+buildTimeline();
+function drawTimeline(t) {
+  const r = tl.getBoundingClientRect();
+  tctx.setTransform(1, 0, 0, 1, 0, 0); tctx.clearRect(0, 0, tl.width, tl.height);
+  tctx.drawImage(tlCache, 0, 0);
+  tctx.setTransform(devicePixelRatio || 1, 0, 0, devicePixelRatio || 1, 0, 0);
+  const x = t / dur * r.width;
+  tctx.fillStyle = css("--ink"); tctx.fillRect(x - 1, 0, 2, r.height);
+}
+tl.addEventListener("click", e => { const r = tl.getBoundingClientRect(); t = (e.clientX - r.left) / r.width * dur; });
+
+// ---------- Boucle ----------
+const $ = id => document.getElementById(id);
+$("delay").textContent = `Décision toutes les 50 ms · fenêtre 200 ms + vote sur 3 + calcul ${D.computeMs} ms`;
+let t = 0, playing = true, last = performance.now();
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "⏸ Pause" : "▶ Lecture"; };
+$("restart").onclick = () => { t = 0; playing = true; $("play").textContent = "⏸ Pause"; };
+function frame(now) {
+  const dt = Math.min(0.5, (now - last) / 1000); last = now;
+  if (playing) { t += dt * D.speed; if (t >= dur) { t = dur; playing = false; $("play").textContent = "▶ Lecture"; } }
+  const i = decisionAt(t);
+  if (i >= 0) {
+    const tr = D.dec.truth[i], pr = D.dec.pred[i];
+    stepPose(POSES[pr] || POSES[0], 0.25);
+    $("truth").textContent = D.names[tr]; $("pred").textContent = D.names[pr];
+    const v = $("verdict");
+    if (tr === pr) { v.textContent = "✓ décodage correct"; v.className = "ok"; }
+    else if (tr === 0) { v.textContent = "✗ mouvement non voulu"; v.className = "ko"; }
+    else if (pr === 0) { v.textContent = "… geste pas encore détecté"; v.className = "neutral"; }
+    else { v.textContent = "✗ mauvais geste"; v.className = "ko"; }
+    $("confbar").style.width = (D.dec.conf[i] * 100).toFixed(0) + "%";
+    D.dec.rms[i].forEach((a, c) => {
+      elec[c].setAttribute("fill", css("--blue")); elec[c].setAttribute("fill-opacity", (0.15 + 0.85 * a).toFixed(2));
+    });
+  } else {
+    D.dec.rms[0].forEach((_, c) => { elec[c].setAttribute("fill", css("--blue")); elec[c].setAttribute("fill-opacity", .15); });
+  }
+  drawHand(); drawEMG(t); drawTimeline(t);
+  $("clock").textContent = `${t.toFixed(1)} s / ${dur.toFixed(1)} s`;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+addEventListener("resize", () => { fit(cv); fit(tl); buildTimeline(); });
+</script>
+</body>
+</html>

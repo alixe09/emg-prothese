@@ -88,6 +88,25 @@ Détails : `models/transfer_summary.json` (valeurs par sujet), code dans
 confiance réglé sur validation : [`src/evaluate_stream.py`](src/evaluate_stream.py),
 résumé par `python src/summarize.py`.
 
+### Embarqué : export TensorFlow Lite
+
+Export des CNN intra-sujet ([`src/export_tflite.py`](src/export_tflite.py)),
+moyenne sur 5 sujets, flux continu avec vote sur 3 :
+
+| Format | Taille | Acc. équilibrée | Accord avec Keras | Calcul / décision (PC) |
+|---|---|---|---|---|
+| float32 | 188 Ko | 60.8 % | 100 % | 0.18 ms |
+| poids int8 | 56 Ko | 60.9 % | ≥ 99.6 % | 0.50 ms |
+| **int8 complet** | **58 Ko** | 59.8 % | ≥ 97.9 % | 0.24 ms |
+
+- **5.2 M multiplications-accumulations par décision**, soit ~100 M/s au rythme
+  d'une décision toutes les 50 ms. La latence sur microcontrôleur n'a pas été
+  mesurée (pas de carte) : c'est la prochaine vérification à faire sur cible.
+- Piège rencontré : quantifier en int8 le signal brut (en volts, très dynamique)
+  écrase les petites amplitudes à zéro et le modèle tombe au niveau du hasard
+  (5.6 %). Solution : normalisation par électrode faite avant le réseau
+  (12 opérations par échantillon) + écrêtage à ±8 écarts-types.
+
 ### Limites
 
 - 5 sujets valides seulement, un seul entraînement par configuration (pas de
@@ -95,6 +114,22 @@ résumé par `python src/summarize.py`.
 - Réglages (seuil, nombre d'époques) choisis sur une seule répétition de
   validation : peu fiable sur certains sujets.
 - Pas encore de sujets amputés (DB3) : la question clé pour une vraie prothèse.
+
+## Démo
+
+Application Streamlit qui rejoue un enregistrement réel (sujet 1, répétition 2,
+jamais vue à l'entraînement) comme le ferait la prothèse : une fenêtre de 200 ms
+toutes les 50 ms, décodée par le modèle **int8** de 58 Ko. On y voit le signal
+des 12 électrodes défiler, une main qui prend la pose du geste décodé, les
+électrodes qui s'allument selon l'activité musculaire, et une frise des
+décisions (gestes corrects, mauvais gestes, mouvements non voulus au repos).
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+Les fichiers de la démo (extrait de 148 s, modèle int8) se régénèrent avec
+`python src/make_demo_data.py --subject 1`.
 
 ## Démarche prévue
 
@@ -105,7 +140,7 @@ résumé par `python src/summarize.py`.
    (MAV, RMS, WL, ZC, SSC) + LDA : l'approche historique des prothèses
    commerciales.
 4. **Deep learning** — CNN 1D sur les fenêtres brutes, comparé à la baseline.
-5. **Contraintes objet connecté**
+5. **Contraintes objet connecté** ✅
    - latence de décision (fenêtre + inférence) < 300 ms ;
    - export TensorFlow Lite quantifié int8, taille mémoire compatible
      microcontrôleur ;
@@ -113,7 +148,7 @@ résumé par `python src/summarize.py`.
      avec quelques secondes de données.
 6. **Valides vs amputés** — écart de performance DB2 / DB3.
 7. **Interprétabilité** — contribution de chaque électrode (muscle) par geste.
-8. **Démo** — signal EMG rejoué en flux + main animée exécutant le geste prédit.
+8. **Démo** ✅ — signal EMG rejoué en flux + main animée exécutant le geste prédit.
 
 ## Structure
 
