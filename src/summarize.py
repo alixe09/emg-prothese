@@ -1,13 +1,14 @@
 """Tableau récapitulatif LDA / CNN sur tous les sujets évalués en flux continu.
 
-Usage : python src/summarize.py
+Usage : python src/summarize.py [--db db3]
 """
 
+import argparse
 import json
 
 import numpy as np
 
-from train import MODELS_DIR
+from train import DB, models_dir
 
 METRICS = [
     ("balanced_accuracy", "Acc. équilibrée", 100, "%"),
@@ -18,8 +19,9 @@ METRICS = [
 ]
 
 
-def main():
-    files = sorted(MODELS_DIR.glob("stream_s*.json"), key=lambda p: int(p.stem[8:]))
+def main(db=DB):
+    out_dir = models_dir(db)
+    files = sorted(out_dir.glob("stream_s*.json"), key=lambda p: int(p.stem[8:]))
     runs = [json.loads(p.read_text()) for p in files]
     subjects = [r["subject"] for r in runs]
     print(f"Sujets : {subjects}  (test en flux continu, répétitions 2 et 5, avec post-traitement)\n")
@@ -40,18 +42,22 @@ def main():
         r["cnn"]["post_traite"]["balanced_accuracy"] - r["lda"]["post_traite"]["balanced_accuracy"]
         for r in runs
     ]) * 100
+    # Rapport non défini si le CNN ne déclenche jamais (ex. sujet sans signal exploitable)
     ratio = np.array([
         r["lda"]["post_traite"]["declenchements_intempestifs_par_min"]
-        / max(r["cnn"]["post_traite"]["declenchements_intempestifs_par_min"], 1e-9)
+        / r["cnn"]["post_traite"]["declenchements_intempestifs_par_min"]
+        if r["cnn"]["post_traite"]["declenchements_intempestifs_par_min"] > 0 else np.nan
         for r in runs
     ])
     print(f"CNN - LDA, acc. équilibrée : {', '.join(f'{d:+.1f}' for d in diff)} points "
           f"(CNN meilleur sur {(diff > 0).sum()}/{len(diff)} sujets)")
-    print(f"Déclenchements intempestifs, LDA / CNN : {', '.join(f'x{x:.1f}' for x in ratio)}")
+    print(f"Déclenchements intempestifs, LDA / CNN : {', '.join('—' if np.isnan(x) else f'x{x:.1f}' for x in ratio)}")
 
     summary["subjects"] = subjects
-    (MODELS_DIR / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--db", default=DB)
+    main(parser.parse_args().db)

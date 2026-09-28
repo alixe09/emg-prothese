@@ -6,7 +6,7 @@ Protocole commun aux deux modèles :
   d'époques), puis le modèle est ré-entraîné sur les 4 répétitions, pour être
   comparé à la LDA à données d'entraînement égales.
 
-Usage : python src/train.py --subject 1
+Usage : python src/train.py --subject 1 [--db db3]
 """
 
 import argparse
@@ -30,11 +30,19 @@ MODELS_DIR = ROOT / "models"
 VAL_REP = 6
 EPOCHS_MAX = 40
 BATCH_SIZE = 64
+DB = "db2"
 REST_FACTOR = 1  # choisi sur validation (src/tune_rest_weight.py) ; voir class_weights()
 
 
-def build_dataset(subject, exercises=(1,)):
-    emg, labels, reps = load_subject(subject, exercises=exercises)
+def models_dir(db=DB):
+    """Résultats DB2 à la racine de models/ (historique), autres bases dans models/<db>/."""
+    d = MODELS_DIR if db == "db2" else MODELS_DIR / db
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def build_dataset(subject, db=DB, exercises=(1,)):
+    emg, labels, reps = load_subject(subject, db=db, exercises=exercises)
     X, y, rep = make_windows(filter_emg(emg), labels, reps)
     return X, y, rep
 
@@ -132,14 +140,14 @@ def fit_cnn(X_train, y_train, n_classes, epochs, X_val=None, y_val=None,
     return model, history
 
 
-def main(subject):
-    X, y, rep = build_dataset(subject)
+def main(subject, db=DB):
+    X, y, rep = build_dataset(subject, db)
     n_classes = int(y.max()) + 1
     train, test = np.isin(rep, TRAIN_REPS), np.isin(rep, TEST_REPS)
     print(f"Sujet {subject} : {train.sum()} fenêtres d'entraînement, "
           f"{test.sum()} de test, {n_classes} classes")
 
-    results = {"subject": subject}
+    results = {"subject": subject, "db": db}
 
     lda = train_lda(X[train], y[train])
     results["lda"] = evaluate(y[test], lda.predict(hudgins_features(X[test])))
@@ -164,15 +172,17 @@ def main(subject):
     results["cnn"]["latence_ms"] = latency_ms(lambda: cnn(one_tf, training=False))
     print("CNN :", results["cnn"])
 
-    MODELS_DIR.mkdir(exist_ok=True)
-    cnn.save(MODELS_DIR / f"cnn_s{subject}.keras")
+    out = models_dir(db)
+    cnn.save(out / f"cnn_s{subject}.keras")
     results["confusion_cnn"] = confusion_matrix(y[test], y_pred).tolist()
     results["history_val"] = {k: [float(v) for v in vals] for k, vals in history.history.items()}
-    with open(MODELS_DIR / f"results_s{subject}.json", "w") as f:
+    with open(out / f"results_s{subject}.json", "w") as f:
         json.dump(results, f, indent=2)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--subject", type=int, default=1)
-    main(parser.parse_args().subject)
+    parser.add_argument("--db", default=DB)
+    args = parser.parse_args()
+    main(args.subject, args.db)

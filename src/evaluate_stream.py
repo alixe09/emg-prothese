@@ -6,7 +6,7 @@
    évalués en flux continu sur les répétitions 2 et 5.
 
 Prérequis : `python src/train.py --subject N` (modèle final + nombre d'époques).
-Usage : python src/evaluate_stream.py --subject 1
+Usage : python src/evaluate_stream.py --subject 1 [--db db3]
 """
 
 import argparse
@@ -19,17 +19,18 @@ from data_loading import load_subject
 from features import hudgins_features
 from postprocessing import decision_delay_ms, stream_metrics, tune, majority_vote, apply_threshold
 from preprocessing import TEST_REPS, TRAIN_REPS, filter_emg, make_stream_windows, make_windows
-from train import MODELS_DIR, VAL_REP, fit_cnn, train_lda
+from train import DB, VAL_REP, fit_cnn, models_dir, train_lda
 
 TAUS = np.round(np.arange(0.0, 0.96, 0.05), 2)
 KS = [1, 3]  # au-delà, le délai total (fenêtre + vote + calcul) dépasse ~300 ms
 
 
-def main(subject):
-    with open(MODELS_DIR / f"results_s{subject}.json") as f:
+def main(subject, db=DB):
+    out_dir = models_dir(db)
+    with open(out_dir / f"results_s{subject}.json") as f:
         results = json.load(f)
 
-    emg, labels, reps = load_subject(subject)
+    emg, labels, reps = load_subject(subject, db=db)
     emg = filter_emg(emg)
     X, y, rep = make_windows(emg, labels, reps)
     Xs, ys, reps_s, block = make_stream_windows(emg, labels, reps)
@@ -50,13 +51,13 @@ def main(subject):
 
     # --- Modèles finaux, probabilités sur le flux de test
     lda = train_lda(X[train], y[train])
-    cnn = tf.keras.models.load_model(MODELS_DIR / f"cnn_s{subject}.keras")
+    cnn = tf.keras.models.load_model(out_dir / f"cnn_s{subject}.keras")
     probs_test = {
         "lda": lda.predict_proba(hudgins_features(Xs[test_s])),
         "cnn": cnn.predict(Xs[test_s], verbose=0),
     }
 
-    out = {"subject": subject}
+    out = {"subject": subject, "db": db}
     for name in ("lda", "cnn"):
         best, grid = tune(probs_val[name], ys[val_s], block[val_s], TAUS, KS)
         raw = stream_metrics(ys[test_s], probs_test[name].argmax(axis=1), block[test_s])
@@ -78,11 +79,13 @@ def main(subject):
                   f"déclench. intempestifs/min {m['declenchements_intempestifs_par_min']:.1f} | "
                   f"délai {m['delai_ms']:.0f} ms")
 
-    with open(MODELS_DIR / f"stream_s{subject}.json", "w") as f:
+    with open(out_dir / f"stream_s{subject}.json", "w") as f:
         json.dump(out, f, indent=2)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--subject", type=int, default=1)
-    main(parser.parse_args().subject)
+    parser.add_argument("--db", default=DB)
+    args = parser.parse_args()
+    main(args.subject, args.db)

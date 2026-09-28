@@ -1,0 +1,59 @@
+{
+  "lda": {
+    "balanced_accuracy": {
+      "moyenne": 32.6040020749629,
+      "ecart_type": 15.912397618275207
+    },
+    "rappel_gestes": {
+      "moyenne": 27.8044792402049,
+      "ecart_type": 16.04698620934083
+    },
+    "faux_gestes_au_repos": {
+      "moyenne": 6.400210866844478,
+      "ecart_type": 4.624846459414248
+    },
+    "declenchements_intempestifs_par_min": {
+      "moyenne": 14.329153108516334,
+      "ecart_type": 5.713884886570576
+    },
+    "delai_ms": {
+      "moyenne": 246.16370690909042,
+      "ecart_type": 14.192334582517816
+    }
+  },
+  "cnn": {
+    "balanced_accuracy": {
+      "moyenne": 32.30116948350047,
+      "ecart_type": 16.518945636291075
+    },
+    "rappel_gestes": {
+      "moyenne": 27.35654392181809,
+      "ecart_type": 16.590209722337796
+    },
+    "faux_gestes_au_repos": {
+      "moyenne": 7.1740574079541295,
+      "ecart_type": 7.647093786139552
+    },
+    "declenchements_intempestifs_par_min": {
+      "moyenne": 16.612315288913603,
+      "ecart_type": 14.378580444473299
+    },
+    "delai_ms": {
+      "moyenne": 252.04393245454247,
+      "ecart_type": 23.37301430000792
+    }
+  },
+  "subjects": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ]
+}

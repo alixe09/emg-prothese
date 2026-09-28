@@ -1,0 +1,688 @@
+{
+  "subject": 10,
+  "db": "db3",
+  "lda": {
+    "reglage": {
+      "tau": 0.95,
+      "k": 3
+    },
+    "brut": {
+      "balanced_accuracy": 0.30832851087932955,
+      "rappel_gestes": 0.29589890319504053,
+      "faux_gestes_au_repos": 0.4809206541490006,
+      "declenchements_intempestifs_par_min": 79.95154451847365,
+      "delai_ms": 200.72658349999983
+    },
+    "post_traite": {
+      "balanced_accuracy": 0.1316320485893604,
+      "rappel_gestes": 0.08464473056747734,
+      "faux_gestes_au_repos": 0.09327680193821926,
+      "declenchements_intempestifs_par_min": 18.170805572380377,
+      "delai_ms": 250.72658349999983
+    },
+    "grille_validation": [
+      {
+        "tau": 0.0,
+        "k": 1,
+        "balanced_accuracy": 0.20899588055261184,
+        "rappel_gestes": 0.19453761379971252,
+        "faux_gestes_au_repos": 0.5083333333333333,
+        "declenchements_intempestifs_par_min": 98.57142857142858
+      },
+      {
+        "tau": 0.0,
+        "k": 3,
+        "balanced_accuracy": 0.21239204236191075,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.49523809523809526,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.05,
+        "k": 1,
+        "balanced_accuracy": 0.20899588055261184,
+        "rappel_gestes": 0.19453761379971252,
+        "faux_gestes_au_repos": 0.5083333333333333,
+        "declenchements_intempestifs_par_min": 98.57142857142858
+      },
+      {
+        "tau": 0.05,
+        "k": 3,
+        "balanced_accuracy": 0.21239204236191075,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.49523809523809526,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.1,
+        "k": 1,
+        "balanced_accuracy": 0.20899588055261184,
+        "rappel_gestes": 0.19453761379971252,
+        "faux_gestes_au_repos": 0.5083333333333333,
+        "declenchements_intempestifs_par_min": 98.57142857142858
+      },
+      {
+        "tau": 0.1,
+        "k": 3,
+        "balanced_accuracy": 0.21239204236191075,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.49523809523809526,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.15,
+        "k": 1,
+        "balanced_accuracy": 0.20899588055261184,
+        "rappel_gestes": 0.19453761379971252,
+        "faux_gestes_au_repos": 0.5083333333333333,
+        "declenchements_intempestifs_par_min": 98.57142857142858
+      },
+      {
+        "tau": 0.15,
+        "k": 3,
+        "balanced_accuracy": 0.21239204236191075,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.49523809523809526,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.2,
+        "k": 1,
+        "balanced_accuracy": 0.20899588055261184,
+        "rappel_gestes": 0.19453761379971252,
+        "faux_gestes_au_repos": 0.5083333333333333,
+        "declenchements_intempestifs_par_min": 98.57142857142858
+      },
+      {
+        "tau": 0.2,
+        "k": 3,
+        "balanced_accuracy": 0.21239204236191075,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.49523809523809526,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.25,
+        "k": 1,
+        "balanced_accuracy": 0.20919429325102454,
+        "rappel_gestes": 0.19453761379971252,
+        "faux_gestes_au_repos": 0.5047619047619047,
+        "declenchements_intempestifs_par_min": 101.42857142857143
+      },
+      {
+        "tau": 0.25,
+        "k": 3,
+        "balanced_accuracy": 0.21259045506032345,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.49166666666666664,
+        "declenchements_intempestifs_par_min": 58.57142857142858
+      },
+      {
+        "tau": 0.3,
+        "k": 1,
+        "balanced_accuracy": 0.20915709087007214,
+        "rappel_gestes": 0.19357930043124102,
+        "faux_gestes_au_repos": 0.48928571428571427,
+        "declenchements_intempestifs_par_min": 104.28571428571429
+      },
+      {
+        "tau": 0.3,
+        "k": 3,
+        "balanced_accuracy": 0.21154950444998308,
+        "rappel_gestes": 0.195495927168184,
+        "faux_gestes_au_repos": 0.4785714285714286,
+        "declenchements_intempestifs_par_min": 61.42857142857143
+      },
+      {
+        "tau": 0.35,
+        "k": 1,
+        "balanced_accuracy": 0.20442545961172584,
+        "rappel_gestes": 0.18735026353617634,
+        "faux_gestes_au_repos": 0.4666666666666667,
+        "declenchements_intempestifs_par_min": 104.28571428571429
+      },
+      {
+        "tau": 0.35,
+        "k": 3,
+        "balanced_accuracy": 0.20451821490239516,
+        "rappel_gestes": 0.18687110685194058,
+        "faux_gestes_au_repos": 0.45595238095238094,
+        "declenchements_intempestifs_par_min": 60.00000000000001
+      },
+      {
+        "tau": 0.4,
+        "k": 1,
+        "balanced_accuracy": 0.19828585162869594,
+        "rappel_gestes": 0.1796837565884044,
+        "faux_gestes_au_repos": 0.45,
+        "declenchements_intempestifs_par_min": 98.57142857142858
+      },
+      {
+        "tau": 0.4,
+        "k": 3,
+        "balanced_accuracy": 0.19705453197734413,
+        "rappel_gestes": 0.17776712985146143,
+        "faux_gestes_au_repos": 0.44047619047619047,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.45,
+        "k": 1,
+        "balanced_accuracy": 0.18979455951732022,
+        "rappel_gestes": 0.16914230953521803,
+        "faux_gestes_au_repos": 0.425,
+        "declenchements_intempestifs_par_min": 95.71428571428572
+      },
+      {
+        "tau": 0.45,
+        "k": 3,
+        "balanced_accuracy": 0.18897059437060248,
+        "rappel_gestes": 0.16770483948251078,
+        "faux_gestes_au_repos": 0.4166666666666667,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.5,
+        "k": 1,
+        "balanced_accuracy": 0.18601438524657732,
+        "rappel_gestes": 0.16339242932438908,
+        "faux_gestes_au_repos": 0.3964285714285714,
+        "declenchements_intempestifs_par_min": 90.0
+      },
+      {
+        "tau": 0.5,
+        "k": 3,
+        "balanced_accuracy": 0.18542239540122196,
+        "rappel_gestes": 0.16195495927168185,
+        "faux_gestes_au_repos": 0.38333333333333336,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.55,
+        "k": 1,
+        "balanced_accuracy": 0.17680925753572668,
+        "rappel_gestes": 0.1509343555342597,
+        "faux_gestes_au_repos": 0.3535714285714286,
+        "declenchements_intempestifs_par_min": 80.0
+      },
+      {
+        "tau": 0.55,
+        "k": 3,
+        "balanced_accuracy": 0.17668171012536246,
+        "rappel_gestes": 0.14997604216578822,
+        "faux_gestes_au_repos": 0.34285714285714286,
+        "declenchements_intempestifs_par_min": 52.85714285714286
+      },
+      {
+        "tau": 0.6,
+        "k": 1,
+        "balanced_accuracy": 0.16995040352095073,
+        "rappel_gestes": 0.14183037853378055,
+        "faux_gestes_au_repos": 0.3261904761904762,
+        "declenchements_intempestifs_par_min": 81.42857142857143
+      },
+      {
+        "tau": 0.6,
+        "k": 3,
+        "balanced_accuracy": 0.1710539522235724,
+        "rappel_gestes": 0.1423095352180163,
+        "faux_gestes_au_repos": 0.31666666666666665,
+        "declenchements_intempestifs_par_min": 48.57142857142858
+      },
+      {
+        "tau": 0.65,
+        "k": 1,
+        "balanced_accuracy": 0.1617303548970243,
+        "rappel_gestes": 0.1317680881648299,
+        "faux_gestes_au_repos": 0.305952380952381,
+        "declenchements_intempestifs_par_min": 77.14285714285715
+      },
+      {
+        "tau": 0.65,
+        "k": 3,
+        "balanced_accuracy": 0.15963915238504411,
+        "rappel_gestes": 0.12889314805941543,
+        "faux_gestes_au_repos": 0.3,
+        "declenchements_intempestifs_par_min": 47.142857142857146
+      },
+      {
+        "tau": 0.7,
+        "k": 1,
+        "balanced_accuracy": 0.15557696825438241,
+        "rappel_gestes": 0.1231432678485865,
+        "faux_gestes_au_repos": 0.27380952380952384,
+        "declenchements_intempestifs_par_min": 65.71428571428572
+      },
+      {
+        "tau": 0.7,
+        "k": 3,
+        "balanced_accuracy": 0.15253779396109712,
+        "rappel_gestes": 0.11931001437470053,
+        "faux_gestes_au_repos": 0.26904761904761904,
+        "declenchements_intempestifs_par_min": 41.42857142857143
+      },
+      {
+        "tau": 0.75,
+        "k": 1,
+        "balanced_accuracy": 0.14795791755552265,
+        "rappel_gestes": 0.11356013416387159,
+        "faux_gestes_au_repos": 0.2523809523809524,
+        "declenchements_intempestifs_par_min": 57.142857142857146
+      },
+      {
+        "tau": 0.75,
+        "k": 3,
+        "balanced_accuracy": 0.14366102812279913,
+        "rappel_gestes": 0.10828941063727839,
+        "faux_gestes_au_repos": 0.24642857142857144,
+        "declenchements_intempestifs_par_min": 38.57142857142858
+      },
+      {
+        "tau": 0.8,
+        "k": 1,
+        "balanced_accuracy": 0.14043725554347594,
+        "rappel_gestes": 0.10397700047915669,
+        "faux_gestes_au_repos": 0.2261904761904762,
+        "declenchements_intempestifs_par_min": 52.85714285714286
+      },
+      {
+        "tau": 0.8,
+        "k": 3,
+        "balanced_accuracy": 0.1347510991326598,
+        "rappel_gestes": 0.097747963584092,
+        "faux_gestes_au_repos": 0.2261904761904762,
+        "declenchements_intempestifs_par_min": 34.285714285714285
+      },
+      {
+        "tau": 0.85,
+        "k": 1,
+        "balanced_accuracy": 0.1323658252361532,
+        "rappel_gestes": 0.09343555342597029,
+        "faux_gestes_au_repos": 0.19642857142857142,
+        "declenchements_intempestifs_par_min": 44.28571428571429
+      },
+      {
+        "tau": 0.85,
+        "k": 3,
+        "balanced_accuracy": 0.1269134737028459,
+        "rappel_gestes": 0.08768567321514135,
+        "faux_gestes_au_repos": 0.1976190476190476,
+        "declenchements_intempestifs_par_min": 27.142857142857146
+      },
+      {
+        "tau": 0.9,
+        "k": 1,
+        "balanced_accuracy": 0.1218351617789826,
+        "rappel_gestes": 0.08049832295160518,
+        "faux_gestes_au_repos": 0.16785714285714284,
+        "declenchements_intempestifs_par_min": 44.28571428571429
+      },
+      {
+        "tau": 0.9,
+        "k": 3,
+        "balanced_accuracy": 0.11721046811516647,
+        "rappel_gestes": 0.07570675610924772,
+        "faux_gestes_au_repos": 0.17023809523809524,
+        "declenchements_intempestifs_par_min": 25.714285714285715
+      },
+      {
+        "tau": 0.95,
+        "k": 1,
+        "balanced_accuracy": 0.11319553178189912,
+        "rappel_gestes": 0.0689985625299473,
+        "faux_gestes_au_repos": 0.12857142857142856,
+        "declenchements_intempestifs_par_min": 38.57142857142858
+      },
+      {
+        "tau": 0.95,
+        "k": 3,
+        "balanced_accuracy": 0.10921347302449479,
+        "rappel_gestes": 0.06468615237182558,
+        "faux_gestes_au_repos": 0.12738095238095237,
+        "declenchements_intempestifs_par_min": 25.714285714285715
+      }
+    ]
+  },
+  "cnn": {
+    "reglage": {
+      "tau": 0.7,
+      "k": 3
+    },
+    "brut": {
+      "balanced_accuracy": 0.20006351517679788,
+      "rappel_gestes": 0.17238912732474965,
+      "faux_gestes_au_repos": 0.29981829194427617,
+      "declenchements_intempestifs_par_min": 72.68322228952151,
+      "delai_ms": 221.03708099999494
+    },
+    "post_traite": {
+      "balanced_accuracy": 0.09982823084520544,
+      "rappel_gestes": 0.05007153075822604,
+      "faux_gestes_au_repos": 0.041792852816474865,
+      "declenchements_intempestifs_par_min": 10.175651120533011,
+      "delai_ms": 271.03708099999494
+    },
+    "grille_validation": [
+      {
+        "tau": 0.0,
+        "k": 1,
+        "balanced_accuracy": 0.21364715455716435,
+        "rappel_gestes": 0.19693339722089123,
+        "faux_gestes_au_repos": 0.4630952380952381,
+        "declenchements_intempestifs_par_min": 84.28571428571429
+      },
+      {
+        "tau": 0.0,
+        "k": 3,
+        "balanced_accuracy": 0.21438898592964944,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.4607142857142857,
+        "declenchements_intempestifs_par_min": 54.28571428571429
+      },
+      {
+        "tau": 0.05,
+        "k": 1,
+        "balanced_accuracy": 0.21364715455716435,
+        "rappel_gestes": 0.19693339722089123,
+        "faux_gestes_au_repos": 0.4630952380952381,
+        "declenchements_intempestifs_par_min": 84.28571428571429
+      },
+      {
+        "tau": 0.05,
+        "k": 3,
+        "balanced_accuracy": 0.21438898592964944,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.4607142857142857,
+        "declenchements_intempestifs_par_min": 54.28571428571429
+      },
+      {
+        "tau": 0.1,
+        "k": 1,
+        "balanced_accuracy": 0.21364715455716435,
+        "rappel_gestes": 0.19693339722089123,
+        "faux_gestes_au_repos": 0.4630952380952381,
+        "declenchements_intempestifs_par_min": 84.28571428571429
+      },
+      {
+        "tau": 0.1,
+        "k": 3,
+        "balanced_accuracy": 0.21438898592964944,
+        "rappel_gestes": 0.19741255390512696,
+        "faux_gestes_au_repos": 0.4607142857142857,
+        "declenchements_intempestifs_par_min": 54.28571428571429
+      },
+      {
+        "tau": 0.15,
+        "k": 1,
+        "balanced_accuracy": 0.21364715455716435,
+        "rappel_gestes": 0.19693339722089123,
+        "faux_gestes_au_repos": 0.4630952380952381,
+        "declenchements_intempestifs_par_min": 84.28571428571429
+      },
+      {
+        "tau": 0.15,
+        "k": 3,
+        "balanced_accuracy": 0.21395154061031438,
+        "rappel_gestes": 0.19693339722089123,
+        "faux_gestes_au_repos": 0.4607142857142857,
+        "declenchements_intempestifs_par_min": 54.28571428571429
+      },
+      {
+        "tau": 0.2,
+        "k": 1,
+        "balanced_accuracy": 0.21327237501571814,
+        "rappel_gestes": 0.1964542405366555,
+        "faux_gestes_au_repos": 0.46190476190476193,
+        "declenchements_intempestifs_par_min": 85.71428571428572
+      },
+      {
+        "tau": 0.2,
+        "k": 3,
+        "balanced_accuracy": 0.21394806882206568,
+        "rappel_gestes": 0.19693339722089123,
+        "faux_gestes_au_repos": 0.4607142857142857,
+        "declenchements_intempestifs_par_min": 54.28571428571429
+      },
+      {
+        "tau": 0.25,
+        "k": 1,
+        "balanced_accuracy": 0.20054457888553517,
+        "rappel_gestes": 0.1816003833253474,
+        "faux_gestes_au_repos": 0.43452380952380953,
+        "declenchements_intempestifs_par_min": 91.42857142857143
+      },
+      {
+        "tau": 0.25,
+        "k": 3,
+        "balanced_accuracy": 0.1993359443254422,
+        "rappel_gestes": 0.18016291327264014,
+        "faux_gestes_au_repos": 0.430952380952381,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.3,
+        "k": 1,
+        "balanced_accuracy": 0.18553818466934255,
+        "rappel_gestes": 0.16291327264015332,
+        "faux_gestes_au_repos": 0.3821428571428571,
+        "declenchements_intempestifs_par_min": 80.0
+      },
+      {
+        "tau": 0.3,
+        "k": 3,
+        "balanced_accuracy": 0.18727834176481306,
+        "rappel_gestes": 0.16435074269286057,
+        "faux_gestes_au_repos": 0.3761904761904762,
+        "declenchements_intempestifs_par_min": 50.0
+      },
+      {
+        "tau": 0.35,
+        "k": 1,
+        "balanced_accuracy": 0.17060570260702435,
+        "rappel_gestes": 0.14278869190225205,
+        "faux_gestes_au_repos": 0.31547619047619047,
+        "declenchements_intempestifs_par_min": 72.85714285714286
+      },
+      {
+        "tau": 0.35,
+        "k": 3,
+        "balanced_accuracy": 0.16989882400209627,
+        "rappel_gestes": 0.1413512218495448,
+        "faux_gestes_au_repos": 0.305952380952381,
+        "declenchements_intempestifs_par_min": 42.85714285714286
+      },
+      {
+        "tau": 0.4,
+        "k": 1,
+        "balanced_accuracy": 0.15289828940191016,
+        "rappel_gestes": 0.12122664111164351,
+        "faux_gestes_au_repos": 0.2702380952380952,
+        "declenchements_intempestifs_par_min": 62.85714285714286
+      },
+      {
+        "tau": 0.4,
+        "k": 3,
+        "balanced_accuracy": 0.14982211832573647,
+        "rappel_gestes": 0.11739338763775754,
+        "faux_gestes_au_repos": 0.2619047619047619,
+        "declenchements_intempestifs_par_min": 41.42857142857143
+      },
+      {
+        "tau": 0.45,
+        "k": 1,
+        "balanced_accuracy": 0.13753652068064384,
+        "rappel_gestes": 0.10253953042644945,
+        "faux_gestes_au_repos": 0.2357142857142857,
+        "declenchements_intempestifs_par_min": 55.714285714285715
+      },
+      {
+        "tau": 0.45,
+        "k": 3,
+        "balanced_accuracy": 0.13219298849335903,
+        "rappel_gestes": 0.09631049353138477,
+        "faux_gestes_au_repos": 0.22857142857142856,
+        "declenchements_intempestifs_par_min": 34.285714285714285
+      },
+      {
+        "tau": 0.5,
+        "k": 1,
+        "balanced_accuracy": 0.1242670437171866,
+        "rappel_gestes": 0.08576904647819837,
+        "faux_gestes_au_repos": 0.19285714285714287,
+        "declenchements_intempestifs_par_min": 54.28571428571429
+      },
+      {
+        "tau": 0.5,
+        "k": 3,
+        "balanced_accuracy": 0.1202338941239145,
+        "rappel_gestes": 0.08097747963584093,
+        "faux_gestes_au_repos": 0.18452380952380953,
+        "declenchements_intempestifs_par_min": 28.571428571428573
+      },
+      {
+        "tau": 0.55,
+        "k": 1,
+        "balanced_accuracy": 0.11106299419891442,
+        "rappel_gestes": 0.0689985625299473,
+        "faux_gestes_au_repos": 0.14642857142857144,
+        "declenchements_intempestifs_par_min": 45.714285714285715
+      },
+      {
+        "tau": 0.55,
+        "k": 3,
+        "balanced_accuracy": 0.10614327053156827,
+        "rappel_gestes": 0.0637278390033541,
+        "faux_gestes_au_repos": 0.14642857142857144,
+        "declenchements_intempestifs_par_min": 27.142857142857146
+      },
+      {
+        "tau": 0.6,
+        "k": 1,
+        "balanced_accuracy": 0.1025720579949633,
+        "rappel_gestes": 0.057498802108289414,
+        "faux_gestes_au_repos": 0.10833333333333334,
+        "declenchements_intempestifs_par_min": 42.85714285714286
+      },
+      {
+        "tau": 0.6,
+        "k": 3,
+        "balanced_accuracy": 0.09928157815477763,
+        "rappel_gestes": 0.05366554863440345,
+        "faux_gestes_au_repos": 0.10238095238095238,
+        "declenchements_intempestifs_par_min": 27.142857142857146
+      },
+      {
+        "tau": 0.65,
+        "k": 1,
+        "balanced_accuracy": 0.09265507077531951,
+        "rappel_gestes": 0.044561571633924296,
+        "faux_gestes_au_repos": 0.06785714285714285,
+        "declenchements_intempestifs_par_min": 25.714285714285715
+      },
+      {
+        "tau": 0.65,
+        "k": 3,
+        "balanced_accuracy": 0.08917012391693413,
+        "rappel_gestes": 0.04072831816003833,
+        "faux_gestes_au_repos": 0.06428571428571428,
+        "declenchements_intempestifs_par_min": 12.857142857142858
+      },
+      {
+        "tau": 0.7,
+        "k": 1,
+        "balanced_accuracy": 0.0798384662045334,
+        "rappel_gestes": 0.029707714422616195,
+        "faux_gestes_au_repos": 0.05357142857142857,
+        "declenchements_intempestifs_par_min": 22.857142857142858
+      },
+      {
+        "tau": 0.7,
+        "k": 3,
+        "balanced_accuracy": 0.07730838045725914,
+        "rappel_gestes": 0.026832774317201723,
+        "faux_gestes_au_repos": 0.04880952380952381,
+        "declenchements_intempestifs_par_min": 10.0
+      },
+      {
+        "tau": 0.75,
+        "k": 1,
+        "balanced_accuracy": 0.07063592367374329,
+        "rappel_gestes": 0.019166267369429803,
+        "faux_gestes_au_repos": 0.04285714285714286,
+        "declenchements_intempestifs_par_min": 17.142857142857142
+      },
+      {
+        "tau": 0.75,
+        "k": 3,
+        "balanced_accuracy": 0.07033417102824063,
+        "rappel_gestes": 0.018687110685194058,
+        "faux_gestes_au_repos": 0.04047619047619048,
+        "declenchements_intempestifs_par_min": 8.571428571428571
+      },
+      {
+        "tau": 0.8,
+        "k": 1,
+        "balanced_accuracy": 0.06722509295713036,
+        "rappel_gestes": 0.014374700527072353,
+        "faux_gestes_au_repos": 0.025,
+        "declenchements_intempestifs_par_min": 15.714285714285715
+      },
+      {
+        "tau": 0.8,
+        "k": 3,
+        "balanced_accuracy": 0.06729123052326792,
+        "rappel_gestes": 0.014374700527072353,
+        "faux_gestes_au_repos": 0.023809523809523808,
+        "declenchements_intempestifs_par_min": 8.571428571428571
+      },
+      {
+        "tau": 0.85,
+        "k": 1,
+        "balanced_accuracy": 0.06215746469191351,
+        "rappel_gestes": 0.008145663632007666,
+        "faux_gestes_au_repos": 0.014285714285714285,
+        "declenchements_intempestifs_par_min": 11.428571428571429
+      },
+      {
+        "tau": 0.85,
+        "k": 3,
+        "balanced_accuracy": 0.06141826672707578,
+        "rappel_gestes": 0.007187350263536177,
+        "faux_gestes_au_repos": 0.011904761904761904,
+        "declenchements_intempestifs_par_min": 4.285714285714286
+      },
+      {
+        "tau": 0.9,
+        "k": 1,
+        "balanced_accuracy": 0.059766975742615504,
+        "rappel_gestes": 0.004791566842357451,
+        "faux_gestes_au_repos": 0.002380952380952381,
+        "declenchements_intempestifs_par_min": 1.4285714285714286
+      },
+      {
+        "tau": 0.9,
+        "k": 3,
+        "balanced_accuracy": 0.059263392857142855,
+        "rappel_gestes": 0.004312410158121706,
+        "faux_gestes_au_repos": 0.0035714285714285713,
+        "declenchements_intempestifs_par_min": 1.4285714285714286
+      },
+      {
+        "tau": 0.95,
+        "k": 1,
+        "balanced_accuracy": 0.057291666666666664,
+        "rappel_gestes": 0.0019166267369429804,
+        "faux_gestes_au_repos": 0.0,
+        "declenchements_intempestifs_par_min": 0.0
+      },
+      {
+        "tau": 0.95,
+        "k": 3,
+        "balanced_accuracy": 0.057291666666666664,
+        "rappel_gestes": 0.0019166267369429804,
+        "faux_gestes_au_repos": 0.0,
+        "declenchements_intempestifs_par_min": 0.0
+      }
+    ]
+  }
+}

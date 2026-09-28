@@ -107,13 +107,74 @@ moyenne sur 5 sujets, flux continu avec vote sur 3 :
   (5.6 %). Solution : normalisation par électrode faite avant le réseau
   (12 opérations par échantillon) + écrêtage à ±8 écarts-types.
 
+### Sujets amputés (DB3)
+
+Mêmes analyses sur les **11 sujets amputés transradiaux** de Ninapro DB3, qui
+*imaginent* faire les gestes avec la main amputée. Particularités : S6 et S7
+n'ont que 10 électrodes (pas de place sur le moignon), S7 n'a plus d'avant-bras
+(signaux au niveau du bruit), l'électrode 7 de S3 semble défectueuse. Aucun
+sujet n'a été écarté.
+
+**Valides vs amputés, même protocole** (moyenne ± écart-type) :
+
+| | Valides (DB2, 5 sujets) | Amputés (DB3, 11 sujets) |
+|---|---|---|
+| Intra-sujet, LDA | 59.1 ± 5.0 % | 32.6 ± 15.9 % |
+| Intra-sujet, CNN | 59.3 ± 8.5 % | 32.3 ± 16.5 % |
+| Nouveau porteur, 4 rép., LDA | 61.8 ± 4.3 % | **41.4 ± 11.9 %** |
+| Nouveau porteur, 4 rép., CNN pré-entraîné | **63.4 ± 6.3 %** | 36.3 ± 12.8 % |
+| Nouveau porteur, sans calibration | 17.7 % | 9.9 % (hasard : 5.6 %) |
+
+*(intra-sujet : seuil de confiance réglé sur validation ; nouveau porteur : vote
+fixe sans seuil — d'où des valeurs différentes pour la même LDA)*
+
+**Nouveau porteur amputé** (pré-entraînement sur les 10 autres amputés) :
+
+| Calibration | Méthode | Acc. équilibrée | Faux gestes au repos |
+|---|---|---|---|
+| 1 répétition | **LDA** | **29.6 ± 10.2 %** | 26.3 % |
+| | CNN pré-entraîné + ajusté | 24.4 ± 9.1 % | 14.6 % |
+| 2 répétitions | **LDA** | **37.0 ± 10.8 %** | 23.6 % |
+| | CNN pré-entraîné + ajusté | 30.3 ± 11.4 % | **10.0 %** |
+| 4 répétitions | **LDA** | **41.4 ± 11.9 %** | 21.4 % |
+| | CNN seul | 37.1 ± 13.9 % | 30.0 % |
+| | CNN pré-entraîné + ajusté | 36.3 ± 12.8 % | **11.3 %** |
+
+Lecture :
+- **L'écart valides / amputés est massif** : la précision est divisée par ~2 et
+  varie énormément d'un amputé à l'autre (de 9 % à 55 %). Les conclusions tirées
+  sur sujets valides ne se transposent pas telles quelles.
+- **Chez les amputés, la LDA classique reste la plus précise** à tous les
+  budgets de calibration. Le pré-entraînement sur d'autres amputés n'améliore pas
+  la précision du CNN : chaque moignon est trop différent des autres.
+- **Le CNN pré-entraîné garde un avantage net sur les mouvements non voulus** :
+  environ 2 fois moins de faux gestes au repos que la LDA (11 % contre 21 %).
+  Sans seuil de confiance, la LDA déclenche un geste sur 5 fenêtres de repos,
+  inacceptable pour un porteur ; avec un seuil réglé (intra-sujet), elle descend
+  à 6.4 %.
+- **Observation (5 + 5 sujets, corrélation seulement)** : les amputés qui
+  utilisent déjà une prothèse myoélectrique (S1, S3, S8, S9, S11) obtiennent
+  44.8 % en moyenne (LDA intra-sujet), contre 25.2 % pour ceux qui n'en ont
+  jamais utilisé (S2, S4, S5, S6, S10). S7, utilisateur mais sans avant-bras,
+  est exclu de cette comparaison. Hypothèse : l'habitude de produire des
+  contractions distinctes compte autant que l'algorithme. La longueur du moignon
+  restant n'explique pas à elle seule les écarts (S5 : 90 % d'avant-bras, 20 %).
+
+Protocole de pré-entraînement allégé pour DB3 (10 sujets, contrainte de 6 Go de
+RAM) : fenêtres toutes les 100 ms, 15 époques maximum, fenêtres découpées à la
+volée. Résultats : `models/db3/`, commandes avec `--db db3`.
+
 ### Limites
 
-- 5 sujets valides seulement, un seul entraînement par configuration (pas de
+- 5 sujets valides et 11 amputés, un seul entraînement par configuration (pas de
   répétition sur plusieurs graines aléatoires).
 - Réglages (seuil, nombre d'époques) choisis sur une seule répétition de
-  validation : peu fiable sur certains sujets.
-- Pas encore de sujets amputés (DB3) : la question clé pour une vraie prothèse.
+  validation : peu fiable sur certains sujets. Le poids de la classe repos,
+  choisi sur un sujet valide, a été appliqué tel quel aux amputés.
+- Protocoles de pré-entraînement différents entre DB2 (4 sujets) et DB3
+  (10 sujets, allégé) : la comparaison du transfert est indicative.
+- Gestes imaginés en laboratoire, bras immobile, sans retour visuel d'une vraie
+  main : en conditions réelles, le porteur s'adapte au contrôleur.
 
 ## Démo
 
@@ -146,7 +207,7 @@ Les fichiers de la démo (extrait de 148 s, modèle int8) se régénèrent avec
      microcontrôleur ;
    - nouvel utilisateur : modèle pré-entraîné sur d'autres sujets, recalibré
      avec quelques secondes de données.
-6. **Valides vs amputés** — écart de performance DB2 / DB3.
+6. **Valides vs amputés** — écart de performance DB2 / DB3. ✅
 7. **Interprétabilité** — contribution de chaque électrode (muscle) par geste.
 8. **Démo** ✅ — signal EMG rejoué en flux + main animée exécutant le geste prédit.
 
