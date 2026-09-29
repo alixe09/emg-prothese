@@ -257,7 +257,28 @@ scikit-learn, SciPy, Streamlit déjà installés) pour économiser l'espace disq
 
 Sinon : `python -m venv venv && pip install -r requirements.txt`.
 
-## Référence
+## Données et licence
 
-Atzori M. et al. (2014). *Electromyography data for non-invasive
-naturally-controlled robotic hand prostheses*. Scientific Data 1, 140053.
+- **Source** : base [Ninapro](https://ninapro.hevs.ch/), jeux DB2 (sujets valides)
+  et DB3 (sujets amputés), fichiers téléchargés sur le site Ninapro.
+- **Licence** : les données sont également déposées par leurs auteurs sur
+  [Dryad](https://doi.org/10.5061/dryad.1k84r) sous licence
+  [CC0 1.0 (domaine public)](https://creativecommons.org/publicdomain/zero/1.0/),
+  qui autorise leur réutilisation et leur redistribution. Le site Ninapro
+  n'indique pas de licence propre et demande de citer l'article ci-dessous. Pour
+  certains sujets DB3, la version du site Ninapro diffère de celle de Dryad ; les
+  fichiers utilisés par la démo (DB2 sujet 1, DB3 sujet 8) ont la même taille
+  dans les deux dépôts.
+- **Ce qui est redistribué ici** : uniquement deux extraits filtrés utilisés par la
+  démo (`app/demo_data/`, répétition 2 de l'exercice 1 de DB2 sujet 1 et DB3
+  sujet 8, ~13 Mo au total). Les données complètes ne sont pas versionnées : les
+  télécharger depuis le site Ninapro ou Dryad (voir [Dataset](#dataset)).
+- **Anonymat** : données publiées pseudonymisées par leurs auteurs (numéro de
+  sujet, caractéristiques générales) ; aucune donnée personnelle ajoutée ici.
+
+### Référence à citer
+
+Atzori M., Gijsberts A., Castellini C., Caputo B., Hager A.-G. M., Elsig S.,
+Giatsidis G., Bassetto F., Müller H. (2014). *Electromyography data for
+non-invasive naturally-controlled robotic hand prostheses*. Scientific Data 1,
+140053. https://doi.org/10.1038/sdata.2014.53
