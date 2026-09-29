@@ -94,8 +94,12 @@ def decode(key):
     return ends, blocks, labels[ends], pred, conf, rms
 
 
+# Lien direct possible : ?porteur=db3_s8&geste=6&t=5&pause=1 (porteur, geste 1–17, instant en s)
+params = st.query_params
+keys = list(SUBJECTS)
 key = st.radio(
-    "Porteur", list(SUBJECTS), format_func=lambda k: SUBJECTS[k]["label"], horizontal=True,
+    "Porteur", keys, format_func=lambda k: SUBJECTS[k]["label"], horizontal=True,
+    index=keys.index(params["porteur"]) if params.get("porteur") in keys else 0,
 )
 st.markdown(SUBJECTS[key]["desc"])
 st.caption(SUBJECTS[key]["context"])
@@ -110,9 +114,11 @@ with left:
     options = ["Séquence complète (17 gestes)"] + [
         f"{g} — {GESTURES_E1[g]}" for g in range(1, 18)
     ]
+    geste = params.get("geste", "")
     choice = st.selectbox(
         "Geste à rejouer",
         options,
+        index=int(geste) if geste.isdigit() and 1 <= int(geste) <= 17 else 0,
         help="Enregistrement réel du porteur choisi (répétition 2, jamais vue par "
         "son modèle pendant l'entraînement) : quelques secondes de repos, puis le geste.",
     )
@@ -168,6 +174,8 @@ payload = {
     },
     "names": {int(k): v for k, v in GESTURES_E1.items()},
     "speed": float((speed or "1×").rstrip("×")),
+    "start": float(params.get("t", 0) or 0),
+    "paused": params.get("pause") == "1",
     "computeMs": round(embarque["latence_pc_ms"], 2),
 }
 

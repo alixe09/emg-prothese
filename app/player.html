@@ -87,7 +87,7 @@ const N = D.dec.t.length, dur = D.duration;
 const P = (f, th, o = {}) => Object.assign({ f, tha: th[0], thl: th[1], spread: 0, dev: 0, wf: 0, ps: 0 }, o);
 const POSES = {
   0: P([.15, .15, .15, .2], [-45, .9]),
-  1: P([1, 1, 1, 1], [-5, 1]),
+  1: P([1, 1, 1, 1], [-28, 1]),
   2: P([0, 0, 1, 1], [35, .6]),
   3: P([0, 0, 1, 1], [-50, 1]),
   4: P([0, 0, 0, 0], [70, .8]),
@@ -134,7 +134,8 @@ el("text", { x: 42, y: 322, "font-size": 10, fill: "var(--muted)" }).textContent
 el("text", { x: 196, y: 298, "font-size": 10, fill: "var(--muted)" }).textContent = "E1–E8";
 
 const handG = el("g", {});
-const palm = el("rect", { x: 100, y: 160, width: 100, height: 105, rx: 22 }, handG);
+const OUTLINE = { stroke: "var(--skin-dark)", "stroke-width": 1.5 };
+const palm = el("rect", { x: 100, y: 160, width: 100, height: 105, rx: 22, ...OUTLINE }, handG);
 const FINGERS = [ // x de la base, longueur, largeur, angle d'écartement
   { x: 111, L: 78, w: 21, a: -11 }, { x: 137, L: 88, w: 22, a: -3.5 },
   { x: 163, L: 81, w: 21, a: 3.5 }, { x: 187, L: 62, w: 18, a: 11 },
@@ -143,11 +144,11 @@ const fingerEls = FINGERS.map(() => ({
   g: el("g", {}, handG), body: null, nail: null,
 }));
 fingerEls.forEach(fe => {
-  fe.body = el("rect", { rx: 10 }, fe.g);
+  fe.body = el("rect", { rx: 10, ...OUTLINE }, fe.g);
   fe.nail = el("rect", { rx: 5, fill: "var(--skin-dark)", opacity: .55 }, fe.g);
 });
 const thumbG = el("g", {}, handG);
-const thumb = el("rect", { rx: 11, width: 24 }, thumbG);
+const thumb = el("rect", { rx: 11, width: 24, ...OUTLINE }, thumbG);
 const knuckles = el("path", { fill: "none", stroke: "var(--skin-dark)", "stroke-width": 2, "stroke-linecap": "round", opacity: 0 }, handG);
 const arrow = el("text", { x: 150, y: 24, "text-anchor": "middle", "font-size": 13, fill: "var(--ink2)" });
 
@@ -255,7 +256,8 @@ tl.addEventListener("click", e => { const r = tl.getBoundingClientRect(); t = (e
 // ---------- Boucle ----------
 const $ = id => document.getElementById(id);
 $("delay").textContent = `Décision toutes les 50 ms · fenêtre 200 ms + vote sur 3 + calcul ${D.computeMs} ms`;
-let t = 0, playing = true, last = performance.now();
+let t = Math.min(D.start || 0, dur), playing = !D.paused, last = performance.now();
+if (D.paused) document.getElementById("play").textContent = "▶ Lecture";
 $("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "⏸ Pause" : "▶ Lecture"; };
 $("restart").onclick = () => { t = 0; playing = true; $("play").textContent = "⏸ Pause"; };
 function frame(now) {

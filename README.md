@@ -15,6 +15,8 @@ interprétabilité, démo Streamlit).
 ⚠️ **Disclaimer** : projet pédagogique / recherche de stage. Ce n'est **pas** un
 dispositif médical.
 
+![Démo : sujet valide, geste « index + majeur tendus » correctement décodé](docs/demo-valide.png)
+
 ## Dataset
 
 [Ninapro](https://ninapro.hevs.ch/) — base publique de référence pour le contrôle
@@ -209,6 +211,14 @@ décisions (gestes corrects, mauvais gestes, mouvements non voulus au repos).
 ```bash
 streamlit run app/streamlit_app.py
 ```
+
+Chez le sujet amputé, les signaux sont plus faibles et la frise des décisions montre
+davantage d'erreurs, notamment des mouvements non voulus (rouge) juste avant le geste :
+
+![Démo : sujet amputé, geste « pouce levé » imaginé et correctement décodé](docs/demo-ampute.png)
+
+Lien direct vers un cas précis : `?porteur=db3_s8&geste=1&t=7&pause=1`
+(porteur, geste 1–17, instant en secondes, lecture en pause).
 
 Les fichiers de la démo (extraits de ~145 s, modèles int8) se régénèrent avec
 `python src/make_demo_data.py --subject 1` et
