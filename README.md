@@ -12,6 +12,9 @@ classique) et [radio-thoracique](https://github.com/alixe09/radio-thoracique) (i
 ici, **signal physiologique temporel**, avec la même démarche (pipeline complet,
 interprétabilité, démo Streamlit).
 
+🔗 **Démo en ligne** : [Ouvrir l'application](https://alixe09-emg-prothese-appstreamlit-app-tnbxlw.streamlit.app/)
+· exemple chez un amputé : [pouce levé imaginé](https://alixe09-emg-prothese-appstreamlit-app-tnbxlw.streamlit.app/?porteur=db3_s8&geste=1&t=7&pause=1)
+
 ⚠️ **Disclaimer** : projet pédagogique / recherche de stage. Ce n'est **pas** un
 dispositif médical.
 
