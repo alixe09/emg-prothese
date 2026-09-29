@@ -7,8 +7,8 @@ santé embarqué** : décision en temps réel, modèle assez léger pour tourner
 un microcontrôleur, adaptation rapide à un nouveau porteur.
 
 Troisième volet d'un portfolio en IA appliquée à la santé, après
-[stroke-risk-predictor](../test/stroke-risk-predictor) (données tabulaires, ML
-classique) et [radio_thoracique](../radio_thoracique) (images, deep learning) :
+[stroke-risk-predictor](https://github.com/alixe09/stroke-risk-predictor) (données tabulaires, ML
+classique) et [radio-thoracique](https://github.com/alixe09/radio-thoracique) (images, deep learning) :
 ici, **signal physiologique temporel**, avec la même démarche (pipeline complet,
 interprétabilité, démo Streamlit).
 
@@ -258,14 +258,16 @@ docs/            figures
 
 ## Installation
 
-Le projet réutilise l'environnement de `radio_thoracique` (TensorFlow,
-scikit-learn, SciPy, Streamlit déjà installés) pour économiser l'espace disque :
+Python 3.12 :
 
 ```bash
-../radio_thoracique/venv/Scripts/activate
+python -m venv venv
+venv\Scripts\activate            # Windows (Linux / macOS : source venv/bin/activate)
+pip install -r requirements.txt
+streamlit run app/streamlit_app.py   # la démo fonctionne sans télécharger Ninapro
 ```
 
-Sinon : `python -m venv venv && pip install -r requirements.txt`.
+Pour relancer les analyses, télécharger d'abord les données (voir [Dataset](#dataset)).
 
 ## Données et licence
 
