@@ -1,0 +1,44 @@
+{
+  "8": {
+    "macs_par_decision": 5172352,
+    "float32": {
+      "taille_ko": 187.89453125,
+      "acc_equilibree_fenetres": 0.4905503817675874,
+      "accord_avec_keras": 1.0,
+      "flux": {
+        "balanced_accuracy": 0.46386763342491644,
+        "rappel_gestes": 0.381269592476489,
+        "faux_gestes_au_repos": 0.015322076297686053,
+        "declenchements_intempestifs_par_min": 7.129455909943715
+      },
+      "latence_pc_ms": 0.19141166669821055,
+      "plus_gros_tenseur_ko": 50.0
+    },
+    "dynamic": {
+      "taille_ko": 55.6796875,
+      "acc_equilibree_fenetres": 0.48954275689039256,
+      "accord_avec_keras": 0.9967147289651396,
+      "flux": {
+        "balanced_accuracy": 0.46292951333690546,
+        "rappel_gestes": 0.3804858934169279,
+        "faux_gestes_au_repos": 0.015634771732332707,
+        "declenchements_intempestifs_par_min": 7.129455909943715
+      },
+      "latence_pc_ms": 0.513187333320578,
+      "plus_gros_tenseur_ko": 70.3125
+    },
+    "int8": {
+      "taille_ko": 57.625,
+      "acc_equilibree_fenetres": 0.4923362010657209,
+      "accord_avec_keras": 0.9793757985033765,
+      "flux": {
+        "balanced_accuracy": 0.4682941778545634,
+        "rappel_gestes": 0.38283699059561127,
+        "faux_gestes_au_repos": 0.0150093808630394,
+        "declenchements_intempestifs_par_min": 7.129455909943715
+      },
+      "latence_pc_ms": 0.24775700003374365,
+      "plus_gros_tenseur_ko": 70.3125
+    }
+  }
+}

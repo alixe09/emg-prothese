@@ -17,7 +17,7 @@ flux continu avec vote sur 3), latence d'inférence mesurée ici sur le PC.
 La latence sur microcontrôleur n'est pas mesurée (pas de carte) : on donne le
 nombre d'opérations (MAC) par décision, qui permet de l'estimer pour une cible.
 
-Usage : python src/export_tflite.py --subjects 1 2 3 4 5
+Usage : python src/export_tflite.py --subjects 1 2 3 4 5 [--db db3]
 """
 
 import argparse
@@ -33,9 +33,8 @@ from data_loading import load_subject
 from inference import NORM_CLIP, TFLiteModel, normalize
 from postprocessing import majority_vote, stream_metrics
 from preprocessing import TEST_REPS, TRAIN_REPS, filter_emg, make_stream_windows, make_windows
-from train import MODELS_DIR
+from train import DB, models_dir
 
-TFLITE_DIR = MODELS_DIR / "tflite"
 VARIANTS = ("float32", "dynamic", "int8")
 N_REPRESENTATIVE = 500
 VOTE_K = 3
@@ -46,7 +45,8 @@ def split_normalization(model):
     (sans la normalisation ni le bruit d'augmentation, inactif en inférence)."""
     norm = next(l for l in model.layers if isinstance(l, layers.Normalization))
     mean = np.asarray(norm.mean).reshape(-1)
-    std = np.sqrt(np.asarray(norm.variance).reshape(-1))
+    # Plancher : électrodes absentes (canal nul) sur certains amputés
+    std = np.maximum(np.sqrt(np.asarray(norm.variance).reshape(-1)), 1e-7)
     inputs = layers.Input(shape=model.input_shape[1:])
     x = inputs
     for layer in model.layers:
@@ -95,12 +95,14 @@ def latency_ms(model, x, n=300):
     return (time.perf_counter() - t) / n * 1000
 
 
-def main(subjects):
-    TFLITE_DIR.mkdir(parents=True, exist_ok=True)
+def main(subjects, db=DB):
+    out_dir = models_dir(db)
+    tflite_dir = out_dir / "tflite"
+    tflite_dir.mkdir(parents=True, exist_ok=True)
     results = {}
     for s in subjects:
         print(f"\n=== Sujet {s} ===")
-        emg, labels, reps = load_subject(s)
+        emg, labels, reps = load_subject(s, db=db)
         emg = filter_emg(emg)
         X, y, rep = make_windows(emg, labels, reps)
         Xs, ys, reps_s, block = make_stream_windows(emg, labels, reps)
@@ -113,11 +115,11 @@ def main(subjects):
         representative = X[rng.choice(train_idx, N_REPRESENTATIVE, replace=False)]
         del X
 
-        keras_model = tf.keras.models.load_model(MODELS_DIR / f"cnn_s{s}.keras")
+        keras_model = tf.keras.models.load_model(out_dir / f"cnn_s{s}.keras")
         res = {"macs_par_decision": count_macs(keras_model)}
         ref = keras_model.predict(X_test, verbose=0).argmax(axis=1)
         mean, std, core = split_normalization(keras_model)
-        (TFLITE_DIR / f"cnn_s{s}_norm.json").write_text(json.dumps(
+        (tflite_dir / f"cnn_s{s}_norm.json").write_text(json.dumps(
             {"mean": mean.tolist(), "std": std.tolist(), "clip": NORM_CLIP}))
 
         for variant in VARIANTS:
@@ -127,7 +129,7 @@ def main(subjects):
             else:
                 content = convert(keras_model, variant, representative)
                 m = TFLiteModel(content)
-            path = TFLITE_DIR / f"cnn_s{s}_{variant}.tflite"
+            path = tflite_dir / f"cnn_s{s}_{variant}.tflite"
             path.write_bytes(content)
             pred = m.predict(X_test).argmax(axis=1)
             stream = stream_metrics(ys, majority_vote(m.predict(Xs).argmax(axis=1), VOTE_K, block), block)
@@ -147,11 +149,13 @@ def main(subjects):
         results[s] = res
         tf.keras.backend.clear_session()
 
-    with open(MODELS_DIR / "tflite_results.json", "w") as f:
+    with open(out_dir / "tflite_results.json", "w") as f:
         json.dump(results, f, indent=2)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--subjects", type=int, nargs="+", default=[1, 2, 3, 4, 5])
-    main(parser.parse_args().subjects)
+    parser.add_argument("--db", default=DB)
+    args = parser.parse_args()
+    main(args.subjects, args.db)

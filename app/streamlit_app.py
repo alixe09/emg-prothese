@@ -12,7 +12,22 @@ from gestures import GESTURES_E1  # noqa: E402
 from inference import TFLiteModel  # noqa: E402
 from postprocessing import majority_vote, stream_metrics  # noqa: E402
 
-SUBJECT = 1
+# Sujets proposés : un valide et un amputé (chiffres : README, évaluation en flux continu)
+SUBJECTS = {
+    "db2_s1": {
+        "label": "Sujet valide — Ninapro DB2, sujet 1",
+        "desc": "Main intacte : le sujet exécute réellement chaque geste.",
+        "context": "Précision de ce sujet sur ses 2 répétitions de test : 64 % · moyenne des 5 sujets valides : 59 %.",
+    },
+    "db3_s8": {
+        "label": "Sujet amputé — Ninapro DB3, sujet 8",
+        "desc": "Amputé de la main droite (50 % de l'avant-bras restant), porteur d'une "
+        "prothèse myoélectrique depuis 4 ans. Il **imagine** chaque geste avec la main "
+        "amputée : la main affichée est ce que ferait la prothèse.",
+        "context": "Précision de ce sujet sur ses 2 répétitions de test : 46 %, dans la moitié haute des amputés · "
+        "moyenne des 11 amputés : 32 % (de 6 % à 54 % selon le moignon et l'expérience).",
+    },
+}
 FS = 2000
 WINDOW = 400   # 200 ms
 STEP = 100     # une décision toutes les 50 ms
@@ -35,17 +50,17 @@ st.warning(
 
 
 @st.cache_resource
-def load_model():
-    norm = json.loads((APP_DIR / "model" / f"cnn_s{SUBJECT}_norm.json").read_text())
+def load_model(key):
+    norm = json.loads((APP_DIR / "model" / f"cnn_{key}_norm.json").read_text())
     return TFLiteModel(
-        path=str(APP_DIR / "model" / f"cnn_s{SUBJECT}_int8.tflite"),
+        path=str(APP_DIR / "model" / f"cnn_{key}_int8.tflite"),
         norm=(np.array(norm["mean"], np.float32), np.array(norm["std"], np.float32)),
     )
 
 
 @st.cache_data
-def load_recording():
-    d = np.load(APP_DIR / "demo_data" / f"s{SUBJECT}_rep2.npz")
+def load_recording(key):
+    d = np.load(APP_DIR / "demo_data" / f"{key}_rep2.npz")
     labels = d["labels"].astype(int)
     # L'extrait concatène, pour chaque geste, [repos + geste] de la répétition 2 :
     # un nouveau bloc commence à chaque retour geste -> repos.
@@ -54,11 +69,11 @@ def load_recording():
 
 
 @st.cache_data
-def decode(_model_key=SUBJECT):
+def decode(key):
     """Rejoue l'enregistrement comme la prothèse : une fenêtre de 200 ms toutes les
     50 ms, inférence du modèle int8, vote sur les 3 dernières décisions."""
-    emg_uv, labels, block = load_recording()
-    model = load_model()
+    emg_uv, labels, block = load_recording(key)
+    model = load_model(key)
     emg_v = emg_uv * 1e-6
     ends, blocks = [], []
     for b in np.unique(block):
@@ -75,10 +90,15 @@ def decode(_model_key=SUBJECT):
     return ends, blocks, labels[ends], pred, conf, rms
 
 
-model = load_model()
-emg_uv, labels, block = load_recording()
-ends, blocks, y_true, y_pred, conf, rms = decode()
-embarque = json.loads((APP_DIR / "model" / f"cnn_s{SUBJECT}_embarque.json").read_text())
+key = st.radio(
+    "Porteur", list(SUBJECTS), format_func=lambda k: SUBJECTS[k]["label"], horizontal=True,
+)
+st.markdown(SUBJECTS[key]["desc"])
+st.caption(SUBJECTS[key]["context"])
+
+emg_uv, labels, block = load_recording(key)
+ends, blocks, y_true, y_pred, conf, rms = decode(key)
+embarque = json.loads((APP_DIR / "model" / f"cnn_{key}_embarque.json").read_text())
 
 # --- Sélection -----------------------------------------------------------------
 left, right = st.columns([2, 1])
@@ -89,9 +109,8 @@ with left:
     choice = st.selectbox(
         "Geste à rejouer",
         options,
-        help="Enregistrement réel du sujet 1 de Ninapro DB2 (répétition 2, jamais "
-        "vue par le modèle pendant l'entraînement) : quelques secondes de repos, "
-        "puis le geste.",
+        help="Enregistrement réel du porteur choisi (répétition 2, jamais vue par "
+        "son modèle pendant l'entraînement) : quelques secondes de repos, puis le geste.",
     )
 with right:
     speed = st.segmented_control("Vitesse", ["0.5×", "1×", "2×"], default="1×")
@@ -110,7 +129,7 @@ s_idx = np.flatnonzero(s_mask)
 m = stream_metrics(y_true[d_mask], y_pred[d_mask], blocks[d_mask])
 c1, c2, c3, c4 = st.columns(4)
 if choice.startswith("Séquence"):
-    c1.metric("Accuracy équilibrée", f"{m['balanced_accuracy']:.0%}")
+    c1.metric("Accuracy équilibrée (cet extrait)", f"{m['balanced_accuracy']:.0%}")
 gest = y_true[d_mask] > 0
 c2.metric("Fenêtres de geste bien décodées", f"{(y_pred[d_mask][gest] == y_true[d_mask][gest]).mean():.0%}")
 c3.metric("Faux gestes pendant le repos", f"{m['faux_gestes_au_repos']:.1%}")
@@ -162,6 +181,7 @@ e3.metric("Calcul par décision (PC)", f"{embarque['latence_pc_ms']:.2f} ms",
 st.caption(
     "La normalisation par électrode est faite avant le réseau (12 opérations par "
     "échantillon) : quantifier directement le signal brut en int8 écrase les petites "
-    "amplitudes et fait chuter le modèle au niveau du hasard. Détails et résultats "
-    "sur 5 sujets dans le README du projet."
+    "amplitudes et fait chuter le modèle au niveau du hasard. Chaque porteur a son "
+    "propre modèle, entraîné sur ses répétitions 1, 3, 4 et 6. Détails et résultats "
+    "sur 5 sujets valides et 11 amputés dans le README du projet."
 )

@@ -178,9 +178,12 @@ volée. Résultats : `models/db3/`, commandes avec `--db db3`.
 
 ## Démo
 
-Application Streamlit qui rejoue un enregistrement réel (sujet 1, répétition 2,
-jamais vue à l'entraînement) comme le ferait la prothèse : une fenêtre de 200 ms
-toutes les 50 ms, décodée par le modèle **int8** de 58 Ko. On y voit le signal
+Application Streamlit qui rejoue un enregistrement réel (répétition 2, jamais vue
+à l'entraînement) comme le ferait la prothèse : une fenêtre de 200 ms toutes les
+50 ms, décodée par le modèle **int8** de 58 Ko du porteur. Deux porteurs au choix :
+un **sujet valide** (DB2, sujet 1) et un **sujet amputé** (DB3, sujet 8 : 50 %
+d'avant-bras restant, porteur d'une prothèse myoélectrique depuis 4 ans, situé
+dans la moitié haute des amputés — la page rappelle la moyenne du groupe). On y voit le signal
 des 12 électrodes défiler, une main qui prend la pose du geste décodé, les
 électrodes qui s'allument selon l'activité musculaire, et une frise des
 décisions (gestes corrects, mauvais gestes, mouvements non voulus au repos).
@@ -189,8 +192,10 @@ décisions (gestes corrects, mauvais gestes, mouvements non voulus au repos).
 streamlit run app/streamlit_app.py
 ```
 
-Les fichiers de la démo (extrait de 148 s, modèle int8) se régénèrent avec
-`python src/make_demo_data.py --subject 1`.
+Les fichiers de la démo (extraits de ~145 s, modèles int8) se régénèrent avec
+`python src/make_demo_data.py --subject 1` et
+`python src/make_demo_data.py --subject 8 --db db3` (après
+`python src/export_tflite.py --subjects 8 --db db3`).
 
 ## Démarche prévue
 
