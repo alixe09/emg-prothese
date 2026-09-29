@@ -11,6 +11,7 @@ sys.path.append(str(APP_DIR.parent / "src"))
 from gestures import GESTURES_E1  # noqa: E402
 from inference import TFLiteModel  # noqa: E402
 from postprocessing import majority_vote, stream_metrics  # noqa: E402
+from signal_quality import guard  # noqa: E402
 
 # Sujets proposés : un valide et un amputé (chiffres : README, évaluation en flux continu)
 SUBJECTS = {
@@ -82,8 +83,11 @@ def decode(key):
         ends.append(e)
         blocks.append(np.full(len(e), b))
     ends, blocks = np.concatenate(ends), np.concatenate(blocks)
-    probs = np.stack([model.predict_one(emg_v[e - WINDOW + 1 : e + 1]) for e in ends])
-    pred = majority_vote(probs.argmax(axis=1), VOTE_K, blocks)
+    windows = [emg_v[e - WINDOW + 1 : e + 1] for e in ends]
+    probs = np.stack([model.predict_one(w) for w in windows])
+    # Contrôle qualité du signal : fenêtre aberrante (saturation, bruit) -> repos
+    raw_pred, _ = guard(probs.argmax(axis=1), windows, model.norm[1])
+    pred = majority_vote(raw_pred, VOTE_K, blocks)
     conf = probs[np.arange(len(pred)), pred]
     # Activité de chaque électrode sur la fenêtre (RMS), pour l'animation
     rms = np.stack([np.sqrt(np.mean(emg_uv[e - WINDOW + 1 : e + 1] ** 2, axis=0)) for e in ends])
@@ -174,6 +178,8 @@ with st.expander("ℹ️ Comment lire cette démo", expanded=True):
    comme s'il arrivait en direct (fond grisé : la personne est en train de faire le geste).
 2. **Toutes les 50 ms**, le modèle lit les 200 dernières millisecondes de signal et
    décide quel geste est voulu ; on garde la décision majoritaire sur les 3 dernières.
+   Avant cela, un contrôle de qualité force le repos si une électrode affiche une
+   amplitude aberrante (saturation, bruit), cas où le modèle se tromperait avec assurance.
 3. **La main dessinée prend la pose du geste décodé** : elle montre ce que *ferait la
    prothèse*, pas le mouvement réel de la personne. Quand le modèle se trompe, la main
    fait le mauvais geste — c'est ce qu'on veut observer. Les ronds bleus sur

@@ -176,6 +176,24 @@ volée. Résultats : `models/db3/`, commandes avec `--db db3`.
 - Gestes imaginés en laboratoire, bras immobile, sans retour visuel d'une vraie
   main : en conditions réelles, le porteur s'adapte au contrôleur.
 
+## Dossier « dispositif médical » et tests
+
+Exercice appliquant la démarche d'un fabricant de dispositif médical, dans
+[`docs/dispositif-medical/`](docs/dispositif-medical/README.md) : usage prévu et
+statut réglementaire (MDR, IEC 62304), **analyse des risques** inspirée d'ISO 14971
+et **matrice de traçabilité** exigences → tests → résultats, générée
+automatiquement.
+
+L'analyse a révélé un défaut de sécurité : face à une électrode saturée ou à un
+bruit fort, le réseau déclenchait un geste avec jusqu'à 99 % de confiance. Un
+contrôle de qualité du signal ([`src/signal_quality.py`](src/signal_quality.py))
+force désormais le repos (0,007 % de fausses alarmes sur signaux réels).
+
+```bash
+python -m pytest tests            # 15 tests automatisés
+python src/verification_report.py # régénère la matrice de traçabilité
+```
+
 ## Démo
 
 Application Streamlit qui rejoue un enregistrement réel (répétition 2, jamais vue
