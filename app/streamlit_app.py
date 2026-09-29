@@ -167,6 +167,27 @@ payload = {
     "computeMs": round(embarque["latence_pc_ms"], 2),
 }
 
+with st.expander("ℹ️ Comment lire cette démo", expanded=True):
+    st.markdown(
+        """
+1. **À gauche**, un vrai enregistrement des 12 électrodes de l'avant-bras est rejoué
+   comme s'il arrivait en direct (fond grisé : la personne est en train de faire le geste).
+2. **Toutes les 50 ms**, le modèle lit les 200 dernières millisecondes de signal et
+   décide quel geste est voulu ; on garde la décision majoritaire sur les 3 dernières.
+3. **La main dessinée prend la pose du geste décodé** : elle montre ce que *ferait la
+   prothèse*, pas le mouvement réel de la personne. Quand le modèle se trompe, la main
+   fait le mauvais geste — c'est ce qu'on veut observer. Les ronds bleus sur
+   l'avant-bras s'allument avec l'activité de chaque électrode.
+4. **Sous la main** : *geste voulu* (ce que la personne fait ou imagine faire) et
+   *geste décodé* (ce que fait la prothèse). **La frise du bas** résume toutes les
+   décisions : bleu = correct, orange = mauvais geste, gris = geste pas encore détecté,
+   rouge = mouvement non voulu pendant le repos (le plus gênant pour un porteur).
+
+Les poses de la main sont simplifiées (dessin 2D vu de dessus) : les mouvements du
+poignet sont suggérés par une légende au-dessus de la main.
+"""
+    )
+
 html = (APP_DIR / "player.html").read_text(encoding="utf-8")
 st.iframe(html.replace("__PAYLOAD__", json.dumps(payload)), height=640)
 
